@@ -28,6 +28,16 @@ enemy_y = random.randint(50, 200)
 enemy_x_change = 0.1
 enemy_y_change = 40
 
+# laser
+laser_img = pygame.image.load('laser.png')
+laser_x = 0
+laser_y = 480
+laser_x_change = 0
+laser_y_change = .5
+# Ready - laser not on screen
+# Fire - laser is moving
+laser_state = "ready"
+
 
 # draw spaceship (player)
 def player(x, y):
@@ -36,6 +46,12 @@ def player(x, y):
 
 def enemy(x, y):
     screen.blit(enemy_img, (x, y))
+
+
+def fire_laser(x, y):
+    global laser_state
+    laser_state = "fire"
+    screen.blit(laser_img, (x + 16, y + 10))
 
 
 # Game Loop
@@ -58,6 +74,13 @@ while running:
                 player_x_change = -.2
             if event.key == pygame.K_RIGHT:
                 player_x_change = .2
+            if event.key == pygame.K_SPACE:
+                # fire one laser at a time
+                if laser_state == "ready":
+                    # Gets current x coordinate of player
+                    laser_x = player_x
+                    fire_laser(laser_x, laser_y)
+
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 player_x_change = 0
@@ -81,6 +104,15 @@ while running:
     elif enemy_x >= 736:
         enemy_x_change = -.1
         enemy_y += enemy_y_change
+
+    # Laser Movement
+    if laser_y <= 0:
+        laser_y = 480
+        laser_state = "ready"
+
+    if laser_state == "fire":
+        fire_laser(laser_x, laser_y)
+        laser_y -= laser_y_change
 
     player(player_x, player_y)
     enemy(enemy_x, enemy_y)
