@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 # Initialize the pygame
 pygame.init()
@@ -38,6 +39,7 @@ laser_y_change = .5
 # Fire - laser is moving
 laser_state = "ready"
 
+score = 0
 
 # draw spaceship (player)
 def player(x, y):
@@ -52,6 +54,13 @@ def fire_laser(x, y):
     global laser_state
     laser_state = "fire"
     screen.blit(laser_img, (x + 16, y + 10))
+
+
+def is_collision(enemy_x, enemy_y, laser_x, laser_y):
+    distance = math.sqrt((math.pow(enemy_x - laser_x, 2)) + (math.pow(enemy_y - laser_y, 2)))
+    if distance < 27:
+        return True
+    return False
 
 
 # Game Loop
@@ -113,6 +122,17 @@ while running:
     if laser_state == "fire":
         fire_laser(laser_x, laser_y)
         laser_y -= laser_y_change
+
+    # Collision
+    collision = is_collision(enemy_x, enemy_y, laser_x, laser_y)
+    if collision:
+        laser_y = 480
+        laser_state = "ready"
+        score += 1
+        print(score)
+        # kill and create new enemy
+        enemy_x = random.randint(0, 736)
+        enemy_y = random.randint(50, 150)
 
     player(player_x, player_y)
     enemy(enemy_x, enemy_y)
