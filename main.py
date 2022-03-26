@@ -37,7 +37,6 @@ for enemy in range(num_enemies):
     enemy_x_change.append(0.1)
     enemy_y_change.append(40)
 
-
 # laser
 laser_img = pygame.image.load('laser.png')
 laser_x = 0
@@ -48,7 +47,18 @@ laser_y_change = .5
 # Fire - laser is moving
 laser_state = "ready"
 
-score = 0
+# Score
+score_value = 0
+font = pygame.font.Font('freesansbold.ttf', 32)
+
+text_x = 10
+text_y = 10
+
+
+def show_score(x, y):
+    score = font.render("Score: " + str(score_value), True, (255, 255, 255))
+    screen.blit(score, (x, y))
+
 
 # draw spaceship (player)
 def player(x, y):
@@ -130,14 +140,12 @@ while running:
         if collision:
             laser_y = 480
             laser_state = "ready"
-            score += 1
-            print(score)
+            score_value += 1
             # kill and create new enemy
             enemy_x[i] = random.randint(0, 736)
             enemy_y[i] = random.randint(50, 150)
 
         enemy(enemy_x[i], enemy_y[i], i)
-
 
     # Laser Movement
     if laser_y <= 0:
@@ -148,6 +156,6 @@ while running:
         fire_laser(laser_x, laser_y)
         laser_y -= laser_y_change
 
-
     player(player_x, player_y)
+    show_score(text_x, text_y)
     pygame.display.update()
