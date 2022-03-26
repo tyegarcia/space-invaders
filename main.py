@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+from pygame import mixer
 
 # Initialize the pygame
 pygame.init()
@@ -9,15 +10,20 @@ pygame.init()
 screen = pygame.display.set_mode((800, 600))
 
 # background image
-background = pygame.image.load('space-background.png')
+background = pygame.image.load('images/space-background.png')
+
+# Background sound
+mixer.music.load('sound/background.wav')
+mixer.music.play(-1) # plays music in loop
+pygame.mixer.music.set_volume(0.1)
 
 # Title and Icon
 pygame.display.set_caption('Space Invaders by Tye Garcia')
-icon = pygame.image.load('alien.png')
+icon = pygame.image.load('images/alien.png')
 pygame.display.set_icon(icon)
 
 # Player
-player_img = pygame.image.load('spaceship.png')
+player_img = pygame.image.load('images/spaceship.png')
 player_x = 370
 player_y = 480
 player_x_change = 0
@@ -31,14 +37,14 @@ enemy_y_change = []
 num_enemies = 6
 
 for enemy in range(num_enemies):
-    enemy_img.append(pygame.image.load('enemy-ship.png'))
+    enemy_img.append(pygame.image.load('images/enemy-ship.png'))
     enemy_x.append(random.randint(0, 736))
     enemy_y.append(random.randint(50, 200))
     enemy_x_change.append(0.1)
     enemy_y_change.append(40)
 
 # laser
-laser_img = pygame.image.load('laser.png')
+laser_img = pygame.image.load('images/laser.png')
 laser_x = 0
 laser_y = 480
 laser_x_change = 0
@@ -105,6 +111,8 @@ while running:
             if event.key == pygame.K_SPACE:
                 # fire one laser at a time
                 if laser_state == "ready":
+                    laser_sound = mixer.Sound('sound/laser.wav')
+                    laser_sound.play()
                     # Gets current x coordinate of player
                     laser_x = player_x
                     fire_laser(laser_x, laser_y)
@@ -138,6 +146,9 @@ while running:
         # Collision
         collision = is_collision(enemy_x[i], enemy_y[i], laser_x, laser_y)
         if collision:
+            explosion_sound = mixer.Sound('sound/explosion.wav')
+            explosion_sound.play()
+            explosion_sound.set_volume(0.3)
             laser_y = 480
             laser_state = "ready"
             score_value += 1
