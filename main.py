@@ -14,7 +14,7 @@ background = pygame.image.load('images/space-background.png')
 
 # Background sound
 mixer.music.load('sound/background.wav')
-mixer.music.play(-1) # plays music in loop
+mixer.music.play(-1)  # plays music in loop
 pygame.mixer.music.set_volume(0.1)
 
 # Title and Icon
@@ -59,6 +59,14 @@ font = pygame.font.Font('freesansbold.ttf', 32)
 
 text_x = 10
 text_y = 10
+
+# Game Over Message
+game_over_font = pygame.font.Font('freesansbold.ttf', 64)
+
+
+def game_over_message():
+    game_over_text = game_over_font.render("GAME OVER", True, (255, 255, 255))
+    screen.blit(game_over_text, (200, 250))
 
 
 def show_score(x, y):
@@ -135,6 +143,14 @@ while running:
 
     # enemy boundaries
     for i in range(num_enemies):
+
+        # Game Over
+        if enemy_y[i] > 440:
+            for j in range(num_enemies):
+                enemy_y[j] = 2000
+            game_over_message()
+            break
+
         enemy_x[i] += enemy_x_change[i]
         if enemy_x[i] <= 0:
             enemy_x_change[i] = .1
