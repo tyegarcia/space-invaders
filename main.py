@@ -23,11 +23,20 @@ player_y = 480
 player_x_change = 0
 
 # Enemy
-enemy_img = pygame.image.load('enemy-ship.png')
-enemy_x = random.randint(0, 736)
-enemy_y = random.randint(50, 200)
-enemy_x_change = 0.1
-enemy_y_change = 40
+enemy_img = []
+enemy_x = []
+enemy_y = []
+enemy_x_change = []
+enemy_y_change = []
+num_enemies = 6
+
+for enemy in range(num_enemies):
+    enemy_img.append(pygame.image.load('enemy-ship.png'))
+    enemy_x.append(random.randint(0, 736))
+    enemy_y.append(random.randint(50, 200))
+    enemy_x_change.append(0.1)
+    enemy_y_change.append(40)
+
 
 # laser
 laser_img = pygame.image.load('laser.png')
@@ -46,8 +55,8 @@ def player(x, y):
     screen.blit(player_img, (x, y))
 
 
-def enemy(x, y):
-    screen.blit(enemy_img, (x, y))
+def enemy(x, y, i):
+    screen.blit(enemy_img[i], (x, y))
 
 
 def fire_laser(x, y):
@@ -107,12 +116,28 @@ while running:
     enemy_x += enemy_x_change
 
     # enemy boundaries
-    if enemy_x <= 0:
-        enemy_x_change = .1
-        enemy_y += enemy_y_change
-    elif enemy_x >= 736:
-        enemy_x_change = -.1
-        enemy_y += enemy_y_change
+    for i in range(num_enemies):
+        enemy_x[i] += enemy_x_change[i]
+        if enemy_x[i] <= 0:
+            enemy_x_change[i] = .1
+            enemy_y[i] += enemy_y_change[i]
+        elif enemy_x[i] >= 736:
+            enemy_x_change[i] = -.1
+            enemy_y[i] += enemy_y_change[i]
+
+        # Collision
+        collision = is_collision(enemy_x[i], enemy_y[i], laser_x, laser_y)
+        if collision:
+            laser_y = 480
+            laser_state = "ready"
+            score += 1
+            print(score)
+            # kill and create new enemy
+            enemy_x[i] = random.randint(0, 736)
+            enemy_y[i] = random.randint(50, 150)
+
+        enemy(enemy_x[i], enemy_y[i], i)
+
 
     # Laser Movement
     if laser_y <= 0:
@@ -123,17 +148,6 @@ while running:
         fire_laser(laser_x, laser_y)
         laser_y -= laser_y_change
 
-    # Collision
-    collision = is_collision(enemy_x, enemy_y, laser_x, laser_y)
-    if collision:
-        laser_y = 480
-        laser_state = "ready"
-        score += 1
-        print(score)
-        # kill and create new enemy
-        enemy_x = random.randint(0, 736)
-        enemy_y = random.randint(50, 150)
 
     player(player_x, player_y)
-    enemy(enemy_x, enemy_y)
     pygame.display.update()
